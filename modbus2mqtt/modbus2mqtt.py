@@ -206,10 +206,11 @@ class Poller:
                     else:
                         if verbosity>=1:
                             print("Slave device "+str(self.slaveid)+" responded with error code:"+str(result).split(',', 3)[2].rstrip(')'))
-                except:
+                except Exception as e:
                     failed = True
                     if verbosity>=1:
-                        print("Error talking to slave device:"+str(self.slaveid)+" (connection timeout)")
+                        # i.e. connection timeout
+                        print("Error talking to slave device:"+str(self.slaveid)+" ("+str(e)+")")
                 self.failCount(failed)
             else:
                 if master.connect():
@@ -624,7 +625,9 @@ def messagehandler(mqc,userdata,msg):
             if valLen>1:
                 result = master.write_registers(int(myRef.reference),value,unit=myRef.device.slaveid)
             else:
-                result = master.write_register(int(myRef.reference),value,unit=myRef.device.slaveid)
+                # use write_registers to fix errors writing nilan compfort300 registers
+                #result = master.write_register(int(myRef.reference),value,unit=myRef.device.slaveid)
+                result = master.write_registers(int(myRef.reference),value,unit=myRef.device.slaveid)
             try:
                 if result.function_code < 0x80:
                     myRef.checkPublish(value) # writing was successful => we can assume, that the corresponding state can be set and published
@@ -652,19 +655,19 @@ def connecthandler(mqc,userdata,flags,rc):
         mqc.publish(globaltopic + "connected", "True", qos=1, retain=True)
     elif rc == 1:
         if verbosity>=1:
-            print("MQTT Connection refused – incorrect protocol version")
+            print("MQTT Connection refused - incorrect protocol version")
     elif rc == 2:
         if verbosity>=1:
-            print("MQTT Connection refused – invalid client identifier")
+            print("MQTT Connection refused - invalid client identifier")
     elif rc == 3:
         if verbosity>=1:
-            print("MQTT Connection refused – server unavailable")
+            print("MQTT Connection refused - server unavailable")
     elif rc == 4:
         if verbosity>=1:
-            print("MQTT Connection refused – bad username or password")
+            print("MQTT Connection refused - bad username or password")
     elif rc == 5:
         if verbosity>=1:
-            print("MQTT Connection refused – not authorised")
+            print("MQTT Connection refused - not authorised")
 
 def disconnecthandler(mqc,userdata,rc):
     if verbosity >= 2:
