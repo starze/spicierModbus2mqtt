@@ -13,7 +13,7 @@ RUN mkdir -p /app/conf/
 # upgrade pip to avoid warnings during the docker build
 RUN pip install  --upgrade pip
 
-RUN pip install  --no-cache-dir pyserial pymodbus
+RUN pip install  --no-cache-dir pyserial pymodbus typing-extensions
 RUN pip install  --no-cache-dir paho-mqtt
 
 ENTRYPOINT [ "python", "-u", "./modbus2mqtt.py", "--config", "/app/conf/modbus2mqtt.csv" ]

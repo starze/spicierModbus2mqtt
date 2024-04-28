@@ -820,7 +820,7 @@ def main():
     
     clientid=globaltopic + "-" + str(time.time())
     global mqc
-    mqc=mqtt.Client(client_id=clientid)
+    mqc=mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, client_id=clientid)
     mqc.on_connect=connecthandler
     mqc.on_message=messagehandler
     mqc.on_disconnect=disconnecthandler
